@@ -1,82 +1,92 @@
-# Grow Therapy Wikipedia API Wrapper
+# Wikipedia Top Articles API Wrapper
 
-This Flask-based web application provides a wrapper around the Wikipedia Pageviews API to retrieve article views data for specified durations.
+This application is a wrapper for the Wikipedia API, fetching top articles and their respective views for given dates and durations.
+
+## Features:
+
+1. Fetch top articles for a specific date and duration (week or month).
+2. Retrieve the total views for a specific article on a given date and duration.
+3. Find out the day of the month when an article got the most page views.
 
 ## Requirements:
 - Flask
 - requests
 
-## Installation & Running:
+## Setup:
 
-1. Clone the repository.
-2. Install the required libraries:
-    ```bash
-    pip install Flask requests
-    ```
+1. Install the required libraries using pip:
 
-3. Run the Flask application:
-    ```bash
-    python app.py
-    ```
+```
+pip install Flask requests
+```
+
+2. Run the application:
+
+```
+python app.py
+```
+
+The application will start and listen on the default Flask port (5000).
 
 ## API Endpoints:
 
-### 1. Top Articles
-Fetches the top articles for a given date and specified duration (`week` or `month`).
+### 1. `/top-articles/<int:year>/<int:month>/<int:day>`
 
-**Endpoint:** `/top-articles/<int:year>/<int:month>/<int:day>`
+Returns the top articles for a specific date and duration (week or month).
 
-**Parameters:**
-- `year`, `month`, `day`: The starting date from which the articles will be fetched.
-- `duration`: Either `week` or `month` to specify the range.
+#### Test Cases:
 
-**Usage:**
-```
-/top-articles/2015/10/10?duration=week
-```
+- **Valid Request**:
+  - Endpoint: `/top-articles/2015/10/10?duration=week`
+  - Expected Response: List of top articles for the week starting from 10th October 2010.
 
-### 2. Article Views
-Retrieves the view count for a specific article over a given duration (`week` or `month`).
+- **Invalid Date**:
+  - Endpoint: `/top-articles/2015/10/10?duration=week`
+  - Expected Response: `{"error": "Invalid date provided."}` with 400 status.
 
-**Endpoint:** `/article-views`
+- **Invalid Duration**:
+  - Endpoint: `/top-articles/2015/10/10?duration=year`
+  - Expected Response: `{"error": "Invalid duration. Please select either 'week' or 'month'."}` with 400 status.
 
-**Parameters:**
-- `title`: The title of the article.
-- `duration`: Either `week` or `month` to specify the range.
+### 2. `/article-views/<int:year>/<int:month>/<int:day>`
 
-**Usage:**
-```
-/article-views?title=Napoleon&duration=week
-```
+Returns the total views for a specific article on a given date and duration.
 
-### 3. Max Views Day
-Finds the day within a given duration (`week` or `month`) when a specific article got the most page views.
+#### Test Cases:
 
-**Endpoint:** `/max-views-day`
+- **Valid Request**:
+  - Endpoint: `/article-views/2015/10/10?title=Python&duration=month`
+  - Expected Response: Total views of the article "Python" for the month of October 2015.
 
-**Parameters:**
-- `title`: The title of the article.
-- `duration`: Either `week` or `month` to specify the range.
+- **No Article Title**:
+  - Endpoint: `/article-views/2015/10/10?duration=month`
+  - Expected Response: `{"error": "Article title is required."}` with 400 status.
 
-**Usage:**
-```
-/max-views-day?title=Napoleon&duration=week
-```
+### 3. `/max-views-day/<int:year>/<int:month>`
+
+Find out the day of the month where a specific article got the most page views.
+
+#### Test Cases:
+
+- **Valid Request**:
+  - Endpoint: `/max-views-day/2015/10?title=Python`
+  - Expected Response: Day of October 2015 where the article "Python" got the most page views.
+
+- **No Article Title**:
+  - Endpoint: `/max-views-day/2015/10`
+  - Expected Response: `{"error": "Article title is required."}` with 400 status.
 
 ## Notes:
-- The application fetches data from the Wikipedia Pageviews API. There might be rate limits applied, so if you're fetching data for a longer duration, it might take some time.
-- Ensure you're querying dates for which Wikipedia has relevant data.
 
-## Future Improvements:
-- Implement caching mechanisms to store data and avoid repeated requests to the Wikipedia API.
-- Enhance error handling to address possible data-fetching issues.
-- Extend the API to cater for more functionalities and possibly other Wikimedia data.
+- Ensure that the `User-Agent` header in the `headers` dictionary is modified to reflect your information or the application's user agent.
+- Make sure not to send too many requests in a short span to avoid rate limits. Adjust `MAX_RETRIES` and `DELAY_BETWEEN_REQUESTS` accordingly.
 
-## Feedback:
-For any feedback or issues, please raise a ticket or send an email. Contributions are also welcomed through pull requests.
+## Future Enhancements:
 
-To run this application:
+- Implement caching to store frequently accessed data and reduce API calls.
+- Add more detailed logging and error handling mechanisms.
+- Implement more filters and sorts for the articles' data.
 
-```
-flask --debug run
-```
+## Author
+Jarod Florence
+jarod.a.florence@gmail.com
